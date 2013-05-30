@@ -8,9 +8,11 @@ OBJECTS = $(OBJ)/main.cmx
 INTERFACES =
 NAME = interpretadorL1
 
-all: $(OBJ) $(BIN) $(INTERFACES) $(OBJECTS)
+all: $(OBJ) $(BIN) $(INCLUDE) $(INTERFACES) $(OBJECTS)
 	$(OC) $(INC) -o $(BIN)/$(NAME) $(OBJECTS)
 
+$(INCLUDE):
+	mkdir $(INCLUDE)
 $(OBJ):
 	mkdir $(OBJ)
 $(BIN):
