@@ -4,7 +4,7 @@ BIN = bin
 OBJ = obj
 INCLUDE = include
 INC = -I $(INCLUDE) -I $(OBJ)
-OBJECTS = $(OBJ)/main.cmx
+OBJECTS = $(OBJ)/Syntax.cmx $(OBJ)/Semantics.cmx $(OBJ)/TypeSystem.cmx $(OBJ)/main.cmx
 INTERFACES =
 NAME = interpretadorL1
 
