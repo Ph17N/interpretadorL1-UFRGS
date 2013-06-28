@@ -37,8 +37,6 @@ let test4 = Let("x",Tint,Num(6),Binop(Plus,Var "x",Num 3));;
 let test5 = Let("y",Tint,Fun("y",Tint,Binop(Geq,Var "y",Num 5)),App(Var "y",Num 2));;
 let test6 = LetRec("sum",Tfun (Tint,Tint),Fun("y",Tint,If(Binop(Geq, Var "y" , Num 0), Binop(Plus,Var "y", Num 1), Num 0 )),App(Var "sum",Num 5));;
 
-let test7 = typeCheck(Num(88),Hashtbl.create 88);;
-
 let rec testAll lst = match lst with
 	| (h::r) ->
 		print_endline (term_to_string h);
@@ -46,7 +44,7 @@ let rec testAll lst = match lst with
 		testAll r
 	| [] -> ();;
 
-let tests = [test4;test5;test6;test7];;
+let tests = [test4;test5;test6];;
 
 testAll tests;
 
