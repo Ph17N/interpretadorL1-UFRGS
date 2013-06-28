@@ -34,11 +34,11 @@ let test2 = Num(23) ;;
 let test3 = App(test1,test2) ;;
 let test4 = typeCheck (Num 88) (Hashtbl.create 88);;
 
-let test5 = Let("x",Tint,Num(6),Binop(Plus,Var "x",Num 3));;
-let test6 = Let("y",Tint,Fun("y",Tint,Binop(Geq,Var "y",Num 5)),App(Var "y",Num 2));;
-let test7 = LetRec("sum",Tfun (Tint,Tint),Fun("y",Tint,If(Binop(Geq, Var "y" , Num 0), Binop(Plus,Var "y", Num 1), Num 0 )),App(Var "sum",Num 5));;
+let test4 = Let("x",Tint,Num(6),Binop(Plus,Var "x",Num 3));;
+let test5 = Let("y",Tint,Fun("y",Tint,Binop(Geq,Var "y",Num 5)),App(Var "y",Num 2));;
+let test6 = LetRec("sum",Tfun (Tint,Tint),Fun("y",Tint,If(Binop(Geq, Var "y" , Num 0), Binop(Plus,Var "y", Num 1), Num 0 )),App(Var "sum",Num 5));;
 
-let test8 = typeCheck(Num(88),Hashtbl.create 88);;
+let test7 = typeCheck(Num(88),Hashtbl.create 88);;
 
 let rec testAll lst = match lst with
 	| (h::r) ->
@@ -50,4 +50,8 @@ let rec testAll lst = match lst with
 let tests = [test4;test5;test6;test7];;
 
 testAll tests;
+
+print_endline (tipo_to_string test4) ;;
+print_endline (term_to_string test3) ;;
+print_endline (term_to_string full_eval) ;;
 

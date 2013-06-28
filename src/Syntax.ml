@@ -4,7 +4,7 @@
 type binop = Plus | Geq
 ;;
 
-type tipo = Tbool | Tint | Tfun of tipo*tipo
+type tipo = Tbool | Tint | Tfun of tipo*tipo | Tlist of tipo | Tempty
 ;;
 
 type term =
