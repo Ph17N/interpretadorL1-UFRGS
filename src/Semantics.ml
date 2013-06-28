@@ -29,6 +29,7 @@ let rec fv (t:term) : string list =
   | Fun (x,tp,t1)    -> remove x (fv t1)
   | Let (x,tp,t1,t2) -> union (fv t1) (remove x (fv t2))
   | Cons (t1,t2)     -> []
+  | LetRec(x,tp,t1,t2) -> union (fv t1) (remove x (fv t2))
 ;;
 
 (* função auxiliar: garante um novo nome de variável, certamente distinto de todas as variáveis contidas na lista recebida como parâmetro *)
@@ -58,8 +59,8 @@ let rec subs (e:term) (x:string) (t:term) : term =
   | Let(y,tp,t1,t2) when x<>y -> let z = newVar (union (union (fv e) (fv t2)) [x;y])
                                  in  Let(z,tp, subs e x t1, subs e x (subs (Var(z)) y t2))
   | Cons(t1,t2)            -> Cons(t1,t2)
+  | LetRec(a,b,c,d) -> LetRec(a,b,c,d)
 ;;
-
 
 
 (* testa se um termo é valor *)
@@ -116,11 +117,18 @@ let rec step (t:term) : term option =
                 |  None -> None
                 |  Some(t') -> Some(Let(x,tp,t',t2)) )
   | Let(x,tp,t1,t2) when not_value t2 ->
-               (match step t2 with
+               (match step (subs t1 x t2) with
                 |  None -> None
                 |  Some(t') -> Some(Let(x,tp,t1,t')) )
   | Let(x,tp,t1,t2) -> Some(subs t1 x t2)
   | Cons(t1,t2) -> None
+  | LetRec(f,tp,Fun(y,t1,e1) ,t2) ->
+			Some(subs
+			    (Fun(y,t1,
+						LetRec(f,tp,Fun(y,t1,e1),e1)),
+			    t2)
+			    )
+	| LetRec(_,_,_,_) -> None
 
 
 (* função que avalia um termo até não haver mais progresso possível *)

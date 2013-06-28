@@ -17,4 +17,5 @@ type term =
 |  Fun   of string*tipo*term
 |  Let   of string*tipo*term*term
 |  Cons  of term*term
+|  LetRec of string*tipo*term*term
 ;;
