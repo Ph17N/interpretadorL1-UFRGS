@@ -8,12 +8,13 @@ type tipo = Tbool | Tint | Tfun of tipo*tipo
 ;;
 
 type term =
-|  Num   of int
-|  Bool  of bool
-|  Binop of binop*term*term
-|  If    of term*term*term
-|  Var   of string
-|  App   of term*term
-|  Fun   of string*tipo*term
-|  Let   of string*tipo*term*term
+|  Num    of int
+|  Bool   of bool
+|  Binop  of binop*term*term
+|  If     of term*term*term
+|  Var    of string
+|  App    of term*term
+|  Fun    of string*tipo*term
+|  Let    of string*tipo*term*term
+|  LetRec of string*tipo*term*term
 ;;
