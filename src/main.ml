@@ -27,21 +27,16 @@ let rec term_to_string (t:term) : string =
 ;;  
 
 
-
-
-
-
-
-
 (*  TESTES *) 
 
-let test1 =  (Fun ("x",Tint,Binop(Plus,Binop(Plus, Var "x", Num 1),Num 2))) ;;
-let test2 =  Num(23) ;;
-let test3 =  App(test1,test2) ;;
+let test1 = (Fun ("x",Tint,Binop(Plus,Binop(Plus, Var "x", Num 1),Num 2))) ;;
+let test2 = Num(23) ;;
+let test3 = App(test1,test2) ;;
+let test4 = typeCheck (Num 88) (Hashtbl.create 88);;
 
 let one_step   = step test3 ;;
 let full_eval  = eval test3 ;;
 
+print_endline (tipo_to_string test4) ;;
 print_endline (term_to_string test3) ;;
 print_endline (term_to_string full_eval) ;;
-
