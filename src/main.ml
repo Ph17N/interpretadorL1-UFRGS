@@ -8,6 +8,8 @@ let rec tipo_to_string (tp:tipo) : string =
   match tp with
   | Tbool -> "bool"
   | Tint  -> "int"
+  | Tlist a -> (tipo_to_string a) ^ " list"
+  | Tempty -> "empty"
   | Tfun(tp1,tp2) -> "(" ^ (tipo_to_string tp1) ^ " -> " ^ (tipo_to_string tp2) ^ ")"
 ;;
 
@@ -53,6 +55,12 @@ let test7 = LetRec("sum",
 let test8 = Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty);;
 let test9 = Unop(Tail,Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty));;
 let test10 = Unop(Head,Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty));;
+let test11 = Let("f",Tfun(Tint,Tlist Tint),Fun(
+                                               "y",Tint,
+                                               Cons(Var "y",Cons(Var "y",Empty))
+                                              ),
+                App(Var "f",Num 12));;
+
 
 let rec showTrace lst = match lst with
 	| (h::r) ->
@@ -71,7 +79,7 @@ let rec testAll lst = match lst with
 				| None -> print_endline "Ill-typed")
 			;
 		with
-			| _ -> print_endline "Type-system failed");
+			| Match_failure (a,b,c) -> Printf.printf "Type-system failed %s %d %d\n" a b c);
 		print_endline "## Execution trace: ##";
 		showTrace (trace h);
 		print_endline "### Trace End ###";
@@ -80,7 +88,7 @@ let rec testAll lst = match lst with
 		testAll r
 	| [] -> ();;
 
-let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10];;
+let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10;test11];;
 
 testAll tests;
 
