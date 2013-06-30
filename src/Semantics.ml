@@ -22,6 +22,7 @@ let rec fv (t:term) : string list =
   match t with
   | Num  (_)         -> []
   | Bool (_)         -> []
+  | Unop (op,t1)     -> fv t1
   | Binop (op,t1,t2) -> union (fv t1) (fv t2)
   | If (t1,t2,t3)    -> union (union (fv t1) (fv t2)) (fv t3)
   | Var (x)          -> [x]
@@ -45,6 +46,7 @@ let rec newVar (l : string list) : string =
 (* função de substituição: implementa {e/x}t *)
 let rec subs (e:term) (x:string) (t:term) : term =
   match t with
+  | Empty                  -> Empty
   | Num(n)                 -> Num(n)
   | Bool(b)                -> Bool(b)
   | Unop(op,t1)            -> Unop(op, subs e x t1)
@@ -68,11 +70,13 @@ let rec subs (e:term) (x:string) (t:term) : term =
 
 
 (* testa se um termo é valor *)
-let value (t:term) : bool =
+let rec value (t:term) : bool =
   match t  with
+  | Empty      -> true
   | Num(_)     -> true
   | Bool(_)    -> true
   | Fun(_,_,_) -> true
+  | Cons(a,b) when value a && value b -> true
   | _          -> false
 ;;
 
