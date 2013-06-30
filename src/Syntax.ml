@@ -1,4 +1,3 @@
-
 (*  SINTAXE  *)
 
 type binop = Plus | Geq | Minus
