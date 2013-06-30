@@ -124,10 +124,10 @@ let rec step (t:term) : term option =
   | Cons(t1,t2) -> None
   | LetRec(f,tp,Fun(y,t1,e1) ,t2) ->
 			Some(subs
-			    (Fun(y,t1,
-						LetRec(f,tp,Fun(y,t1,e1),e1)),
-			    t2)
-			    )
+						(Fun(y, t1, LetRec(f,tp,Fun(y,t1,e1),e1)))
+						f
+						t2
+					)
 	| LetRec(_,_,_,_) -> None
 
 
