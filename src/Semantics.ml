@@ -28,7 +28,7 @@ let rec fv (t:term) : string list =
   | App (t1,t2)      -> union (fv t1) (fv t2)
   | Fun (x,tp,t1)    -> remove x (fv t1)
   | Let (x,tp,t1,t2) -> union (fv t1) (remove x (fv t2))
-  | Cons (t1,t2)     -> []
+  | Cons (t1,t2)     -> union (fv t1) (fv t2)
   | LetRec(x,tp,t1,t2) -> union (fv t1) (remove x (fv t2))
 ;;
 
@@ -47,6 +47,7 @@ let rec subs (e:term) (x:string) (t:term) : term =
   match t with
   | Num(n)                 -> Num(n)
   | Bool(b)                -> Bool(b)
+  | Unop(op,t1)            -> Unop(op, subs e x t1)
   | Binop(op,t1,t2)        -> Binop(op, subs e x t1, subs e x t2)
   | If(t1,t2,t3)           -> If(subs e x t1, subs e x t2, subs e x t3)
   | Var(y) when x=y        -> e
@@ -58,7 +59,7 @@ let rec subs (e:term) (x:string) (t:term) : term =
   | Let(y,tp,t1,t2) when x=y  -> Let(y,tp, subs e x t1,t2)
   | Let(y,tp,t1,t2) when x<>y -> let z = newVar (union (union (fv e) (fv t2)) [x;y])
                                  in  Let(z,tp, subs e x t1, subs e x (subs (Var(z)) y t2))
-  | Cons(t1,t2)            -> Cons(t1,t2)
+  | Cons(t1,t2)            -> Cons(subs e x t1 , subs e x t2)
   (* no caso do let rec, deve-se substituir toda a ocorrencia de y em t1 por z pois y pode aparecer em t1 *)
   | LetRec(y,tp,t1,t2) when x=y  -> LetRec(y,tp, subs e x t1,t2)
   | LetRec(y,tp,t1,t2) when x<>y -> let z = newVar (union (union (fv e) (fv t2)) [x;y])
@@ -85,6 +86,8 @@ let rec step (t:term) : term option =
   match t with
   | Num(_)  -> None
   | Bool(_) -> None
+  | Unop(Head,Cons(t1,t2)) -> Some t1
+  | Unop(Tail,Cons(t1,t2)) -> Some t2
   | Binop(op,t1,t2) when not_value t1 ->
                (match step t1 with
                 |  None -> None
@@ -125,15 +128,21 @@ let rec step (t:term) : term option =
                 |  None -> None
                 |  Some(t') -> Some(Let(x,tp,t1,t')) )
   | Let(x,tp,t1,t2) -> Some(subs t1 x t2)
-  | Cons(t1,t2) -> None
+  | Cons(t1,t2) when not_value t1 ->
+		           (match step t1 with
+                |  None -> None
+                |  Some(t') -> Some(Cons(t',t2) ))
+  | Cons(t1,t2) when not_value t2 ->
+		           (match step t2 with
+                |  None -> None
+                |  Some(t') -> Some(Cons(t1,t') ))
   | LetRec(f,tp,Fun(y,t1,e1),t2) ->
 			Some(subs
 						(Fun(y, t1, LetRec(f,tp,Fun(y,t1,e1),e1)))
 						f
 						t2
 					)
-	| LetRec(_,_,_,_) -> None
-(* (fn y:T1 ⇒ let rec f :T1 → T2 = (fn y:T1 ⇒ e1 ) in e1 end)/f }e2 *)
+	| _ -> None
 
 (* função que avalia um termo até não haver mais progresso possível *)
 let rec eval (t:term) : term =

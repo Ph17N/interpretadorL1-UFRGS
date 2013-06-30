@@ -17,6 +17,8 @@ let rec term_to_string (t:term) : string =
   | Num(x) -> string_of_int x
   | Bool(true) -> "true"
   | Bool(false) -> "false"
+  | Unop (Head,t1) -> "( Head" ^ (term_to_string t1) ^ ")"
+  | Unop (Tail,t1) -> "( Tail" ^ (term_to_string t1) ^ ")"
   | Binop(Plus,t1,t2) -> "(" ^ (term_to_string t1) ^ " + " ^ (term_to_string t2) ^ ")"
   | Binop(Minus,t1,t2) -> "(" ^ (term_to_string t1) ^ " - " ^ (term_to_string t2) ^ ")"
   | Binop(Geq,t1,t2) -> "(" ^ (term_to_string t1) ^ " >= " ^ (term_to_string t2) ^ ")"
@@ -26,6 +28,8 @@ let rec term_to_string (t:term) : string =
   | Fun(x,tp,t1) -> "(fun " ^ x ^ ":" ^ (tipo_to_string tp) ^ "=>" ^ (term_to_string t1) ^ ")"
   | Let(x,tp,t1,t2) -> "(let " ^ x ^ ":" ^ (tipo_to_string tp) ^ "=" ^ (term_to_string t1) ^ " in " ^ (term_to_string t2) ^ ")"
   | LetRec(x,tp,t1,t2) -> "(let rec " ^ x ^ ":" ^ (tipo_to_string tp) ^ "=" ^ (term_to_string t1) ^ " in " ^ (term_to_string t2) ^ ")"
+  | Cons(a,b) -> "(" ^ (term_to_string a) ^ "::" ^ (term_to_string b) ^ ")"
+  | Empty -> "[]"
 ;;
 
 (*  TESTES *)
@@ -42,9 +46,12 @@ let test7 = LetRec("sum",
                   Fun("y",
                       Tint,
                       If(Binop(Geq, Var "y" , Num 0),
-                         Binop(Plus,App(Var "sum", Binop(Minus,Var "y", Num 1)),(Var "y")),
+                         Binop(Plus,(Var "y"),App(Var "sum", Binop(Minus,Var "y", Num 1))),
                          Num 0 )),
                   App(Var "sum",Num 5));;
+let test8 = Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty);;
+let test9 = Unop(Tail,Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty));;
+let test10 = Unop(Head,Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty));;
 
 let rec showTrace lst = match lst with
 	| (h::r) ->
@@ -60,16 +67,19 @@ let rec testAll lst = match lst with
 		showTrace (trace h);
 		print_endline "### Trace End ###";
 		print_endline (term_to_string (eval h));
-		let t = typeCheck h (Hashtbl.create 88) in
-		(match t with
-			| Some t0 -> print_endline (tipo_to_string t0)
-			| None -> print_endline "Ill-typed")
-		;
+		(try
+			let t = typeCheck h (Hashtbl.create 88) in
+			(match t with
+				| Some t0 -> print_endline (tipo_to_string t0)
+				| None -> print_endline "Ill-typed")
+			;
+		with
+			| _ -> print_endline "Type-system failed");
 		print_endline "###########";
 		testAll r
 	| [] -> ();;
 
-let tests = [test1;test2;test3;test4;test5;test6;test7];;
+let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10];;
 
 testAll tests;
 
