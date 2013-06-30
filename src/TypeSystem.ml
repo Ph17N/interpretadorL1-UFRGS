@@ -6,9 +6,10 @@ open Syntax;;
 
 let rec typeCheck (t:term) gamma =
   match t with
+  | Empty              -> Some Tempty
   | Num  (_)           -> Some Tint
   | Bool (_)           -> Some Tbool
-  | Binop (Plus,t1,t2) -> 
+  | Binop (Plus,t1,t2) ->
 	let (ta,tb) = (typeCheck t1 gamma, typeCheck t2 gamma) in
 	(match (ta,tb) with
 		| (Some tc, Some td) ->
@@ -18,7 +19,7 @@ let rec typeCheck (t:term) gamma =
 				None
 		| (None,_) -> None
 		| (_,None) -> None)
-  | Binop (Geq,t1,t2)  -> 
+  | Binop (Geq,t1,t2)  ->
 	let (ta,tb) = (typeCheck t1 gamma, typeCheck t2 gamma) in
 	(match (ta,tb) with
 		| (Some tc, Some td) ->
@@ -41,20 +42,20 @@ let rec typeCheck (t:term) gamma =
 		Some (Hashtbl.find gamma x)
 	with Not_found ->
 		None)
-  | App (t1,t2)        -> 
+  | App (t1,t2)        ->
 	let ta = typeCheck t1 gamma in
 	let tb = typeCheck t2 gamma in
 	(match (ta,tb) with
 	| (Some (Tfun (tc,td)), Some te) -> if tc = te then Some td else None
 	| _ -> None)
   | Fun (x,tp,t1)      -> Some tp
-  | Let (x,tp,t1,t2)   -> 
+  | Let (x,tp,t1,t2)   ->
 	let ta = typeCheck t1 gamma in
 	let tb = typeCheck t2 gamma in
 	(match (ta,tb) with
 	| (Some tc, Some td) -> if tc = tp then Some td else None
 	| _ -> None)
-  | Cons (t1,t2)       -> 
+  | Cons (t1,t2)       ->
 	let ta = typeCheck t1 gamma in
 	let tb = typeCheck t2 gamma in
 	(match (ta,tb) with
