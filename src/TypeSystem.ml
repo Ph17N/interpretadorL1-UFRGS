@@ -61,4 +61,5 @@ let rec typeCheck (t:term) gamma =
 		| (Some tc, Some Tempty) -> Some (Tlist tc)
 		| (Some tc, Some (Tlist td)) -> if tc = td then Some (Tlist tc) else None
 		| (_,_) -> None)
+  | _ -> None (* só pra parar de dar fatal error na execução *)
 ;;
