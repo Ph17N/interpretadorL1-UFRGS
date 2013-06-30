@@ -17,6 +17,8 @@ let rec term_to_string (t:term) : string =
   | Num(x) -> string_of_int x
   | Bool(true) -> "true"
   | Bool(false) -> "false"
+  | Unop (Head,t1) -> "( Head" ^ (term_to_string t1) ^ ")"
+  | Unop (Tail,t1) -> "( Tail" ^ (term_to_string t1) ^ ")"
   | Binop(Plus,t1,t2) -> "(" ^ (term_to_string t1) ^ " + " ^ (term_to_string t2) ^ ")"
   | Binop(Minus,t1,t2) -> "(" ^ (term_to_string t1) ^ " - " ^ (term_to_string t2) ^ ")"
   | Binop(Geq,t1,t2) -> "(" ^ (term_to_string t1) ^ " >= " ^ (term_to_string t2) ^ ")"
@@ -44,10 +46,12 @@ let test7 = LetRec("sum",
                   Fun("y",
                       Tint,
                       If(Binop(Geq, Var "y" , Num 0),
-                         Binop(Plus,App(Var "sum", Binop(Minus,Var "y", Num 1)),(Var "y")),
+                         Binop(Plus,(Var "y"),App(Var "sum", Binop(Minus,Var "y", Num 1))),
                          Num 0 )),
                   App(Var "sum",Num 5));;
 let test8 = Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty);;
+let test9 = Unop(Tail,Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty));;
+let test10 = Unop(Head,Cons(Let("x",Tint,Num 5,Binop(Minus,Var "x",Num 3)),Empty));;
 
 let rec showTrace lst = match lst with
 	| (h::r) ->
@@ -75,7 +79,7 @@ let rec testAll lst = match lst with
 		testAll r
 	| [] -> ();;
 
-let tests = [test1;test2;test3;test4;test5;test6;test7;test8];;
+let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10];;
 
 testAll tests;
 

@@ -47,6 +47,7 @@ let rec subs (e:term) (x:string) (t:term) : term =
   match t with
   | Num(n)                 -> Num(n)
   | Bool(b)                -> Bool(b)
+  | Unop(op,t1)            -> Unop(op, subs e x t1)
   | Binop(op,t1,t2)        -> Binop(op, subs e x t1, subs e x t2)
   | If(t1,t2,t3)           -> If(subs e x t1, subs e x t2, subs e x t3)
   | Var(y) when x=y        -> e
@@ -85,6 +86,8 @@ let rec step (t:term) : term option =
   match t with
   | Num(_)  -> None
   | Bool(_) -> None
+  | Unop(Head,Cons(t1,t2)) -> Some t1
+  | Unop(Tail,Cons(t1,t2)) -> Some t2
   | Binop(op,t1,t2) when not_value t1 ->
                (match step t1 with
                 |  None -> None
@@ -133,16 +136,13 @@ let rec step (t:term) : term option =
 		           (match step t2 with
                 |  None -> None
                 |  Some(t') -> Some(Cons(t1,t') ))
-  | Cons(_,_) -> None
-  | Empty -> None
   | LetRec(f,tp,Fun(y,t1,e1),t2) ->
 			Some(subs
 						(Fun(y, t1, LetRec(f,tp,Fun(y,t1,e1),e1)))
 						f
 						t2
 					)
-	| LetRec(_,_,_,_) -> None
-(* (fn y:T1 ⇒ let rec f :T1 → T2 = (fn y:T1 ⇒ e1 ) in e1 end)/f }e2 *)
+	| _ -> None
 
 (* função que avalia um termo até não haver mais progresso possível *)
 let rec eval (t:term) : term =
