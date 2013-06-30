@@ -9,6 +9,33 @@ let rec typeCheck (t:term) gamma =
 	| Empty              -> Some Tempty
 	| Num  (_)           -> Some Tint
 	| Bool (_)           -> Some Tbool
+	| Unop (Head,t1) ->
+		let (ta) = (typeCheck t1 gamma) in
+		(match (ta) with
+			| (Some (Tlist tb)) ->
+				if Some (Tlist tb) -> Some tb then
+					Some tb
+				else
+					None
+			| _ -> None)
+	| Unop (Tail,t1) ->
+		let (ta) = (typeCheck t1 gamma) in
+		(match (ta) with
+			| (Some (Tlist tb)) ->
+				if Some Tlist tb -> Some tb then
+					Some tb
+				else
+					None
+			| _ -> None)
+	| Unop (IsEmpty,t1) ->
+		let (ta) = (typeCheck t1 gamma) in
+		(match (ta) with
+			| (Some tb) ->
+				if ta = Tint && tb = Tint then
+					None
+				else
+					Some Tbool
+			| _ -> None)
 	| Binop (Plus,t1,t2) ->
 		let (ta,tb) = (typeCheck t1 gamma, typeCheck t2 gamma) in
 		(match (ta,tb) with
