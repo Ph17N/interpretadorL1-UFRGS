@@ -1,7 +1,7 @@
 
 (*  SINTAXE  *)
 
-type binop = Plus | Geq
+type binop = Plus | Geq | Minus
 ;;
 
 type tipo = Tbool | Tint | Tfun of tipo*tipo | Tlist of tipo | Tempty

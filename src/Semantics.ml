@@ -59,7 +59,10 @@ let rec subs (e:term) (x:string) (t:term) : term =
   | Let(y,tp,t1,t2) when x<>y -> let z = newVar (union (union (fv e) (fv t2)) [x;y])
                                  in  Let(z,tp, subs e x t1, subs e x (subs (Var(z)) y t2))
   | Cons(t1,t2)            -> Cons(t1,t2)
-  | LetRec(a,b,c,d) -> LetRec(a,b,c,d)
+  (* no caso do let rec, deve-se substituir toda a ocorrencia de y em t1 por z pois y pode aparecer em t1 *)
+  | LetRec(y,tp,t1,t2) when x=y  -> LetRec(y,tp, subs e x t1,t2)
+  | LetRec(y,tp,t1,t2) when x<>y -> let z = newVar (union (union (fv e) (fv t2)) [x;y])
+                                 in  LetRec(z,tp, subs (Var z) y (subs e x t1), subs e x (subs (Var(z)) y t2))
 ;;
 
 
@@ -91,6 +94,7 @@ let rec step (t:term) : term option =
 	            | None -> None
                 | Some(t') -> Some(Binop(op,t1,t')) )
   | Binop(Plus,Num(n1),Num(n2)) -> Some(Num(n1+n2))
+  | Binop(Minus,Num(n1),Num(n2)) -> Some(Num(n1-n2))
   | Binop(Geq,Num(n1),Num(n2))  -> Some(Bool(n1>=n2))
   | Binop(_,_,_) -> None
   | If(p,t1,t2) when not_value p ->
@@ -122,14 +126,14 @@ let rec step (t:term) : term option =
                 |  Some(t') -> Some(Let(x,tp,t1,t')) )
   | Let(x,tp,t1,t2) -> Some(subs t1 x t2)
   | Cons(t1,t2) -> None
-  | LetRec(f,tp,Fun(y,t1,e1) ,t2) ->
+  | LetRec(f,tp,Fun(y,t1,e1),t2) ->
 			Some(subs
 						(Fun(y, t1, LetRec(f,tp,Fun(y,t1,e1),e1)))
 						f
 						t2
 					)
 	| LetRec(_,_,_,_) -> None
-
+(* (fn y:T1 ⇒ let rec f :T1 → T2 = (fn y:T1 ⇒ e1 ) in e1 end)/f }e2 *)
 
 (* função que avalia um termo até não haver mais progresso possível *)
 let rec eval (t:term) : term =
@@ -137,3 +141,7 @@ let rec eval (t:term) : term =
   | None -> t
   | Some(t') -> eval(t')
 ;;
+
+let rec trace t = match step t with
+	| None -> []
+	| Some t' -> t' :: (trace t')

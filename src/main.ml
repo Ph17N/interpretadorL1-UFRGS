@@ -18,6 +18,7 @@ let rec term_to_string (t:term) : string =
   | Bool(true) -> "true"
   | Bool(false) -> "false"
   | Binop(Plus,t1,t2) -> "(" ^ (term_to_string t1) ^ " + " ^ (term_to_string t2) ^ ")"
+  | Binop(Minus,t1,t2) -> "(" ^ (term_to_string t1) ^ " - " ^ (term_to_string t2) ^ ")"
   | Binop(Geq,t1,t2) -> "(" ^ (term_to_string t1) ^ " >= " ^ (term_to_string t2) ^ ")"
   | If(t1,t2,t3) -> "(if " ^ (term_to_string t1) ^ " then " ^ (term_to_string t2) ^ " else " ^ (term_to_string t3) ^ ")"
   | Var(x) -> x
@@ -35,11 +36,29 @@ let test3 = App(test1,test2) ;;
 
 let test4 = Let("x",Tint,Num(6),Binop(Plus,Var "x",Num 3));;
 let test5 = Let("y",Tint,Fun("y",Tint,Binop(Geq,Var "y",Num 5)),App(Var "y",Num 2));;
-let test6 = LetRec("sum",Tfun (Tint,Tint),Fun("y",Tint,If(Binop(Geq, Var "y" , Num 0), Binop(Plus,Var "y", Num 1), Num 0 )),App(Var "sum",Num 5));;
+let test6 = LetRec("inc",Tfun (Tint,Tint),Fun("y",Tint,If(Binop(Geq, Var "y" , Num 0), Binop(Plus,Var "y", Num 1), Num 0 )),App(Var "inc",Num 5));;
+let test7 = LetRec("sum",
+                  Tfun (Tint,Tint),
+                  Fun("y",
+                      Tint,
+                      If(Binop(Geq, Var "y" , Num 0),
+                         Binop(Plus,App(Var "sum", Binop(Minus,Var "y", Num 1)),(Var "y")),
+                         Num 0 )),
+                  App(Var "sum",Num 5));;
+
+let rec showTrace lst = match lst with
+	| (h::r) ->
+		print_endline (term_to_string h);
+		showTrace r
+	| [] -> ()
+;;
 
 let rec testAll lst = match lst with
 	| (h::r) ->
 		print_endline (term_to_string h);
+		print_endline "## Execution trace: ##";
+		showTrace (trace h);
+		print_endline "### Trace End ###";
 		print_endline (term_to_string (eval h));
 		let t = typeCheck h (Hashtbl.create 88) in
 		(match t with
@@ -50,7 +69,7 @@ let rec testAll lst = match lst with
 		testAll r
 	| [] -> ();;
 
-let tests = [test1;test2;test3;test4;test5;test6];;
+let tests = [test1;test2;test3;test4;test5;test6;test7];;
 
 testAll tests;
 
