@@ -88,6 +88,8 @@ let rec step (t:term) : term option =
   | Bool(_) -> None
   | Unop(Head,Cons(t1,t2)) -> Some t1
   | Unop(Tail,Cons(t1,t2)) -> Some t2
+  | Unop(IsEmpty,Empty) -> Some (Bool true)
+  | Unop(IsEmpty,Cons(_,_)) -> Some (Bool false)
   | Binop(op,t1,t2) when not_value t1 ->
                (match step t1 with
                 |  None -> None

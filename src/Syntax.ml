@@ -1,6 +1,6 @@
 (*  SINTAXE  *)
 
-type unop = Head | Tail
+type unop = Head | Tail | IsEmpty
 ;;
 
 type binop = Plus | Geq | Minus
