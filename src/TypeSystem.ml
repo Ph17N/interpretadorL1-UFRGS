@@ -29,6 +29,16 @@ let rec typeCheck (t:term) gamma =
 					None
 			| (None,_) -> None
 			| (_,None) -> None)
+	| Binop (Minus,t1,t2)  ->
+		let (ta,tb) = (typeCheck t1 gamma, typeCheck t2 gamma) in
+		(match (ta,tb) with
+			| (Some tc, Some td) ->
+				if tc = Tint && td = Tint then
+					Some Tint
+				else
+					None
+			| (None,_) -> None
+			| (_,None) -> None)
 	| If (t1,t2,t3)      ->
 		let ta = typeCheck t1 gamma in
 		let tb = typeCheck t2 gamma in
@@ -73,5 +83,12 @@ let rec typeCheck (t:term) gamma =
 			| (Some tc, Some Tempty) -> Some (Tlist tc)
 			| (Some tc, Some (Tlist td)) -> if tc = td then Some (Tlist tc) else None
 			| (_,_) -> None)
+(*	| LetRec (x,tp,t1,t2)   ->
+		let ta = typeCheck t1 gamma in
+		let tb = typeCheck t2 gamma in
+		(match (ta,tb) with
+		| (Some tc, Some td) -> let rec tc = tp then Some td else None
+		| _ -> None) *)
 	| _ -> None (* só pra parar de dar fatal error na execução *)
+
 ;;
