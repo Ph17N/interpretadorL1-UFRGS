@@ -98,12 +98,17 @@ let rec typeCheck (t:term) gamma =
 			| (Some tc, Some (Tlist Tempty)) -> Some (Tlist tc)
 			| (Some tc, Some (Tlist td)) -> if tc = td then Some (Tlist tc) else None
 			| (_,_) -> None)
-(*	| LetRec (x,tp,t1,t2)   ->
-		let ta = typeCheck t1 gamma in
-		let tb = typeCheck t2 gamma in
-		(match (ta,tb) with
-		| (Some tc, Some td) -> let rec tc = tp then Some td else None
-		| _ -> None) *)
+	| LetRec (x,(Tfun (tx1,tx2)),(Fun (y,ty1,e1)),e2) when tx1 = ty1->
+		Hashtbl.add gamma x (Tfun (tx1,tx2));
+		let tb = typeCheck e2 gamma in
+		Hashtbl.add gamma y ty1;
+		let ta = typeCheck e1 gamma in
+		let t = (match (ta,tb) with
+		| (Some tc, Some td) when tc = tx2 -> Some td
+		| _ -> None) in
+		Hashtbl.remove gamma y;
+		Hashtbl.remove gamma x;
+		t
 	| _ -> None (* só pra parar de dar fatal error na execução *)
 
 ;;

@@ -61,7 +61,7 @@ let test11 = Let("f",Tfun(Tint,Tlist Tint),Fun(
                                               ),
                 App(Var "f",Num 12));;
 
-let test12 = Cons(Let("x",Tint,Num 5, Binop(Geq,Var "x", Num 4)),Empty);;
+let test12 = Cons(Let("x",Tint,Num 5, (Binop (Geq,Var "x",Num 4))),Empty);;
 
 let rec showTrace lst = match lst with
 	| (h::r) ->
@@ -80,7 +80,7 @@ let rec testAll lst = match lst with
 				| None -> print_endline "Ill-typed")
 			;
 		with
-			| Match_failure (a,b,c) -> Printf.printf "Type-system failed %s %d %d\n" a b c);
+			| Match_failure (a,b,c) -> Printf.printf "Type-system failed at %s (%d, %d)\n" a b c);
 		print_endline "## Execution trace: ##";
 		showTrace (trace h);
 		print_endline "### Trace End ###";
