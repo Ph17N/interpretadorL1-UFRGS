@@ -19,9 +19,9 @@ let rec term_to_string (t:term) : string =
   | Num(x) -> string_of_int x
   | Bool(true) -> "true"
   | Bool(false) -> "false"
-  | Unop (Head,t1) -> "( Head" ^ (term_to_string t1) ^ ")"
-  | Unop (Tail,t1) -> "( Tail" ^ (term_to_string t1) ^ ")"
-  | Unop (IsEmpty,t1) -> "( IsEmpty" ^ (term_to_string t1) ^ ")"
+  | Unop (Head,t1) -> "( Head " ^ (term_to_string t1) ^ ")"
+  | Unop (Tail,t1) -> "( Tail " ^ (term_to_string t1) ^ ")"
+  | Unop (IsEmpty,t1) -> "( IsEmpty " ^ (term_to_string t1) ^ ")"
   | Binop(Plus,t1,t2) -> "(" ^ (term_to_string t1) ^ " + " ^ (term_to_string t2) ^ ")"
   | Binop(Minus,t1,t2) -> "(" ^ (term_to_string t1) ^ " - " ^ (term_to_string t2) ^ ")"
   | Binop(Geq,t1,t2) -> "(" ^ (term_to_string t1) ^ " >= " ^ (term_to_string t2) ^ ")"
@@ -63,6 +63,27 @@ let test11 = Let("f",Tfun(Tint,Tlist Tint),Fun(
 
 let test12 = Cons(Let("x",Tint,Num 5, (Binop (Geq,Var "x",Num 4))),Empty);;
 
+let test13 = LetRec    ("map",
+
+            Tfun(Tlist(Tint),Tlist(Tint)),
+            Fun    ("list",
+                Tlist(Tint),
+                If     (Unop(IsEmpty,Var "list"),
+                    Empty,
+                    Cons(Binop(Plus,Unop(Head,Var "list"),Unop(Head,Var "list")),App(Var "map",Unop(Tail,Var "list")))
+                    )
+                ),
+            App(Var "map",Cons(Num 8, Cons(Num 14, Cons (Num ~-3,Empty))))
+            );;
+
+let id =
+	Let("id",
+				Tfun(Tlist Tint, Tlist Tint),
+				Fun("lst",(Tlist Tint),
+				Cons(Unop(Head,Var "lst"), (Unop (Tail,Var "lst")))),
+				App(Var "id", Cons(Num 4,Cons(Num 3,Empty)))
+	)
+
 let rec showTrace lst = match lst with
 	| (h::r) ->
 		print_endline (term_to_string h);
@@ -89,7 +110,7 @@ let rec testAll lst = match lst with
 		testAll r
 	| [] -> ();;
 
-let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10;test11;test12];;
+let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10;test11;test12;test13;id];;
 
 testAll tests;;
 

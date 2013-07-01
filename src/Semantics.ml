@@ -20,6 +20,7 @@ let rec remove a l =
 (* calcula as variáveis livres de um termo *)
 let rec fv (t:term) : string list =
   match t with
+  | Empty            -> []
   | Num  (_)         -> []
   | Bool (_)         -> []
   | Unop (op,t1)     -> fv t1
@@ -92,6 +93,7 @@ let rec step (t:term) : term option =
   | Bool(_) -> None
   | Unop(Head,Cons(t1,t2)) -> Some t1
   | Unop(Tail,Cons(t1,t2)) -> Some t2
+  | Unop(Tail,Empty)       -> Some Empty
   | Unop(IsEmpty,Empty) -> Some (Bool true)
   | Unop(IsEmpty,Cons(_,_)) -> Some (Bool false)
   | Binop(op,t1,t2) when not_value t1 ->
