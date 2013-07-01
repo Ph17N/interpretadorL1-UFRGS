@@ -61,6 +61,7 @@ let test11 = Let("f",Tfun(Tint,Tlist Tint),Fun(
                                               ),
                 App(Var "f",Num 12));;
 
+let test12 = Cons(Let("x",Tint,Num 5, Binop(Geq,Var "x", Num 4)),Empty);;
 
 let rec showTrace lst = match lst with
 	| (h::r) ->
@@ -88,9 +89,9 @@ let rec testAll lst = match lst with
 		testAll r
 	| [] -> ();;
 
-let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10;test11];;
+let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10;test11;test12];;
 
-testAll tests;
+testAll tests;;
 
 (*let typeTest1 = typeCheck (Num 88) (Hashtbl.create 88);;*)
 

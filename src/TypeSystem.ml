@@ -6,35 +6,23 @@ open Syntax;;
 
 let rec typeCheck (t:term) gamma =
 	match t with
-	| Empty              -> Some Tempty
+	| Empty              -> Some (Tlist Tempty)
 	| Num  (_)           -> Some Tint
 	| Bool (_)           -> Some Tbool
 	| Unop (Head,t1) ->
 		let (ta) = (typeCheck t1 gamma) in
 		(match (ta) with
-			| (Some (Tlist tb)) ->
-				if Some (Tlist tb) -> Some tb then
-					Some tb
-				else
-					None
+			| (Some (Tlist tb)) -> Some tb
 			| _ -> None)
-	| Unop (Tail,t1) ->
-		let (ta) = (typeCheck t1 gamma) in
+	| Unop (Tail,Cons(t1,t2)) ->
+		let (ta) = (typeCheck t2 gamma) in
 		(match (ta) with
-			| (Some (Tlist tb)) ->
-				if Some Tlist tb -> Some tb then
-					Some tb
-				else
-					None
+			| (Some (Tlist tb)) -> ta
 			| _ -> None)
 	| Unop (IsEmpty,t1) ->
 		let (ta) = (typeCheck t1 gamma) in
 		(match (ta) with
-			| (Some tb) ->
-				if ta = Tint && tb = Tint then
-					None
-				else
-					Some Tbool
+			| (Some (Tlist tb)) -> Some Tbool
 			| _ -> None)
 	| Binop (Plus,t1,t2) ->
 		let (ta,tb) = (typeCheck t1 gamma, typeCheck t2 gamma) in
@@ -107,7 +95,7 @@ let rec typeCheck (t:term) gamma =
 		let ta = typeCheck t1 gamma in
 		let tb = typeCheck t2 gamma in
 		(match (ta,tb) with
-			| (Some tc, Some Tempty) -> Some (Tlist tc)
+			| (Some tc, Some (Tlist Tempty)) -> Some (Tlist tc)
 			| (Some tc, Some (Tlist td)) -> if tc = td then Some (Tlist tc) else None
 			| (_,_) -> None)
 (*	| LetRec (x,tp,t1,t2)   ->
