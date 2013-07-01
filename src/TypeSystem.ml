@@ -85,7 +85,7 @@ let rec typeCheck (t:term) gamma =
 		let ta = typeCheck t1 gamma in
 		let tb = typeCheck t2 gamma in
 		(match (ta,tb) with
-		| (Some (Tfun (tc,td)), Some te) -> if tc = te then Some td else None
+		| (Some (Tfun (tc,td)), Some te) -> if compareType tc te then Some td else None
 		| _ -> None)
 	| Fun (x,tp,t1)      ->
 		Hashtbl.add gamma x tp;
@@ -101,7 +101,7 @@ let rec typeCheck (t:term) gamma =
 		Hashtbl.add gamma x tp;
 		let tb = typeCheck t2 gamma in
 		let t = (match (ta,tb) with
-			| (Some tc, Some td) -> if tc = tp then Some td else None
+			| (Some tc, Some td) -> if compareType tc tp then Some td else None
 			| _ -> None) in
 		Hashtbl.remove gamma x;
 		t
@@ -110,7 +110,7 @@ let rec typeCheck (t:term) gamma =
 		let tb = typeCheck t2 gamma in
 		(match (ta,tb) with
 			| (Some tc, Some (Tlist Tempty)) -> Some (Tlist tc)
-			| (Some tc, Some (Tlist td)) -> if tc = td then Some (Tlist tc) else None
+			| (Some tc, Some (Tlist td)) -> if compareType tc td then Some (Tlist tc) else None
 			| (_,_) -> None)
 	| LetRec (x,(Tfun (tx1,tx2)),(Fun (y,ty1,e1)),e2) when compareType tx1 ty1->
 		Hashtbl.add gamma x (Tfun (tx1,tx2));
