@@ -21,13 +21,13 @@ let rec typeCheck (t:term) gamma =
 	| Unop (Head,t1) ->
 		let (ta) = (typeCheck t1 gamma) in
 		(match (ta) with
-			| (Some (Tlist tb)) -> Some tb
+			| (Some (Tlist tb)) when tb <> Tempty -> Some tb
 			| _ -> None)
-	(*| Unop (Tail,Cons(t1,t2)) ->
+	| Unop (Tail,Cons(t1,t2)) ->
 		let (ta) = (typeCheck t2 gamma) in
 		(match (ta) with
 			| (Some (Tlist tb)) -> ta
-			| _ -> None)*)
+			| _ -> None)
 	| Unop (Tail,t1) ->
 		let (ta) = (typeCheck t1 gamma) in
 		(match (ta) with

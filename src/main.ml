@@ -112,7 +112,18 @@ let rec testAll lst = match lst with
 
 let tests = [test1;test2;test3;test4;test5;test6;test7;test8;test9;test10;test11;test12;test13;id];;
 
+let bad1 = Binop(Minus,Num 3, Empty);;
+let bad2 = Unop(Tail,Num 4);;
+let bad3 = Unop(Head,Empty);;
+let bad4 = Cons(Num 4, Cons (Bool true, Empty));;
+let bad5 = Cons(Num 4, Bool false);;
+let bad6 = Let("x",Tbool,Bool true,If((Bool true),(Var "x"),(Num 5)));;
+let bad7 = LetRec("x",Tbool,Bool true,If((Bool true),(Num 7),(Num 5)));;
+
+let badTests = [bad1;bad2;bad3;bad4;bad5;bad6;bad7];;
+
 testAll tests;;
 
-(*let typeTest1 = typeCheck (Num 88) (Hashtbl.create 88);;*)
+print_endline "\nIll-typed expressions:\n";
 
+testAll badTests;;
